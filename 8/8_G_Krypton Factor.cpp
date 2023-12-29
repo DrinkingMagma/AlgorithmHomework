@@ -1,46 +1,152 @@
-# include <iostream>
-# include <string>
+// #include <cstdio>
+// #include <cstring>
+// #include <cstdlib>
+// #include <cctype>
+// #include <cmath>
+// #include <iostream>
+// #include <sstream>
+// #include <iterator>
+// #include <algorithm>
+// #include <string>
+// #include <vector>
+// #include <set>
+// #include <map>
+// #include <stack>
+// #include <deque>
+// #include <queue>
+// #include <list>
+// #define Min(a, b) ((a < b) ? a : b)
+// #define Max(a, b) ((a < b) ? b : a)
+// typedef long long ll;
+// typedef unsigned long long llu;
+// const int INT_INF = 0x3f3f3f3f;
+// const int INT_M_INF = 0x7f7f7f7f;
+// const ll LL_INF = 0x3f3f3f3f3f3f3f3f;
+// const ll LL_M_INF = 0x7f7f7f7f7f7f7f7f;
+// const int dr[] = {0, 0, -1, 1, -1, -1, 1, 1};
+// const int dc[] = {-1, 1, 0, 0, -1, 1, -1, 1};
+// const int MOD = 1e9 + 7;
+// const double pi = acos(-1.0);
+// const double eps = 1e-8;
+// const int MAXN = 100 + 10;
+// const int MAXT = 10000 + 10;
+// using namespace std;
+// int n, L;
+// int ans[MAXN];
+// int cnt;
+// int dfs(int cur)
+// {
+//     if (cnt++ == n)
+//     { // cnt为当前为第几串
+//         for (int i = 0; i < cur; ++i)
+//         {
+//             if (i && (i % 64 == 0))
+//                 printf("\n");
+//             else if (i && (i % 4 == 0))
+//                 printf(" ");
+//             printf("%c", 'A' + ans[i]);
+//         }
+//         printf("\n");
+//         printf("%d\n", cur);
+//         return 0;
+//     }
+//     else
+//     {
+//         for (int i = 0; i < L; ++i)
+//         {
+//             ans[cur] = i;
+//             bool ok = true;
+//             for (int j = 1; j * 2 <= cur + 1; ++j)
+//             { // cur+1为当前串的长度,检查后缀最多只用检查到（cur+1）/2,因为再往前检查，检查的前串短于后串，没必要检查
+//                 bool flag = true;
+//                 for (int k = 0; k < j; ++k)
+//                 {
+//                     if (ans[cur - k] != ans[cur - k - j])
+//                     {
+//                         flag = false;
+//                         break;
+//                     }
+//                 }
+//                 if (flag)
+//                 { // 方案不合法
+//                     ok = false;
+//                     break;
+//                 }
+//             }
+//             if (ok)
+//             { // 方案合法继续递归
+//                 if (!dfs(cur + 1))
+//                     return 0; // 已经找到解，退出所有递归
+//             }
+//         }
+//         return 1;
+//     }
+// }
+// int main()
+// {
+//     while (scanf("%d%d", &n, &L) == 2)
+//     {
+//         if (!n && !L)
+//             return 0;
+//         cnt = 0;
+//         memset(ans, 0, sizeof ans);
+//         dfs(0);
+//     }
+//     return 0;
+// }
 
-using namespace std;
-int n, l;
+#include <cstdio>
+#include <cstring>
 
-bool check(string ans) {  // 每次只判断增加后的部分是否导致存在容易的串
-    int len = ans.length();
-    for (int i = 1; 2 * i <= len; i++) {  //
-        int start = len - 2 * i, start1 = len - i;  // 计算左部分与右部分的起始位置
-        bool ok = false;
-        for (int j = 0; j < i; j++) {  // 左部分与右部分逐个判断
-            if (ans[start + j] != ans[start1 + j]) {
-                ok = true;  break;
+int n, L;
+int ans[110];
+int cnt;
+
+int dfs(int cur) {
+    if (cnt++ == n) { // cnt为当前为第几串
+        for (int i = 0; i < cur; ++i) {
+            if (i && (i % 64 == 0))
+                printf("\n");
+            else if (i && (i % 4 == 0))
+                printf(" ");
+            printf("%c", 'A' + ans[i]);
+        }
+        printf("\n");
+        printf("%d\n", cur);
+        return 0;
+    } else {
+        for (int i = 0; i < L; ++i) {
+            ans[cur] = i;
+            bool ok = true;
+            for (int j = 1; j * 2 <= cur + 1; ++j) { // cur+1为当前串的长度,检查后缀最多只用检查到（cur+1）/2,因为再往前检查，检查的前串短于后串，没必要检查
+                bool flag = true;
+                for (int k = 0; k < j; ++k) {
+                    if (ans[cur - k] != ans[cur - k - j]) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) { // 方案不合法
+                    ok = false;
+                    break;
+                }
+            }
+            if (ok) { // 方案合法继续递归
+                if (!dfs(cur + 1))
+                    return 0; // 已经找到解，退出所有递归
             }
         }
-        if (ok) continue;  // ok = true，存在不相等的字符，说明该长度不可能存在“简易的串”，那么检查一个长度（2，4，6，8...2*i）
-        return false;
+        return 1;
     }
-    return true;  // 检查完，所有偶数长度都不存在 -> true，是复杂的串
-}
-
-bool dfs(string ans = "") {
-    if (!check(ans))  // 判断
-        return false;  // 不满足条件，返回
-    if (ans.length() == n) {  // 符合条件 & 长度为n
-        cout << ans << endl;  // 实际题目要求输出更加复杂这里做了简化
-        return true;
-    }
-
-    for (int i = 0; i < l; i++) {
-        ans += char(65 + i);
-        // 一个为true，即找到了一个结果，一个返回true，全部返回true，结束
-        if (dfs(ans))   return true;  
-        ans.pop_back();  // 状态恢复
-    }
-    // 特别注意，不然遍历完默认返回了true（但其实并没有找到，应该继续返回上层继续搜索），导致结果异常！
-    return false;  
 }
 
 int main() {
-    // 简单输入
-    cin >> n >> l;
-    dfs();
+    while (scanf("%d%d", &n, &L) == 2) {
+        if (!n && !L)
+            return 0;
+        cnt = 0;
+        memset(ans, 0, sizeof ans);
+        dfs(0);
+    }
     return 0;
 }

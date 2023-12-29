@@ -1,187 +1,47 @@
-// #include <iostream>
-// #include <cstdio>
-// #include <cstring>
-// #include <algorithm>
-// using namespace std;
-// const int maxn = 300;
-// struct Node
-// {
-//     int t;
-//     int next;
-// };
-// Node G[maxn];
-// int p[maxn];
-// int l;
-// void init()
-// {
-//     l = 0;
-//     memset(p, -1, sizeof(p));
-// }
-// void addedge(int u, int t)
-// {
-//     G[l].t = t;
-//     G[l].next = p[u];
-//     p[u] = l++;
-// }
-// int _max;
-// int du[maxn];
-// int max1[maxn], max2[maxn];
-// int tmp[4];
-// void dfs(int u, int fath)
-// {
-//     max1[u] = max2[u] = -(1 << 25);
-//     if (du[u] == 1 && u != 1)
-//     {
-//         max1[u] = 0;
-//         max2[u] = -(1 << 25);
-//         return;
-//     }
-//     for (int i = p[u]; i != -1; i = G[i].next)
-//     {
-//         int t = G[i].t;
-//         if (t == fath)
-//             continue;
-//         dfs(t, u);
-//         tmp[0] = max1[u], tmp[1] = max2[u];
-//         tmp[2] = 1 + max1[t];
-//         sort(tmp, tmp + 3);
-//         max1[u] = tmp[2], max2[u] = tmp[1];
-//     }
-//     _max = max(_max, max1[u]);
-//     _max = max(_max, max1[u] + max2[u]);
-// }
-// int main()
-// {
-//     int ci;
-//     while (scanf("%d", &ci) == 1)
-//     {
-//         int ans = 0;
-//         while (ci--)
-//         {
-//             int n;
-//             scanf("%d", &n);
-//             init();
-//             memset(du, 0, sizeof(du));
-//             for (int i = 0; i < n - 1; i++)
-//             {
-//                 int u, v;
-//                 scanf("%d%d", &u, &v);
-//                 addedge(u, v);
-//                 addedge(v, u);
-//                 du[u]++, du[v]++;
-//             }
-//             _max = 0;
-//             dfs(1, -1);
-//             ans += _max;
-//         }
-//         printf("%d\n", ans);
-//     }
-//     return 0;
-// }
-
-
-
-
 #include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <vector>
 using namespace std;
 
-const int MX=101;
-int result, num, sum = 0;
-
-int get_first_edge(int matrix[MX][MX], int node)
+const int maxn = 105;
+vector<int> vec[maxn];
+int dp[maxn];
+void dfs(int x, int pre)
 {
-    for(int i = 1; i <= num; i++)
+    for (int i = 0; i < vec[x].size(); i++)
     {
-        if(matrix[node][i] == 1)
-        {   
-            return i;
-        }
+        if (vec[x][i] == pre)
+            continue;
+        dfs(vec[x][i], x);
+        dp[0] = max(dp[0], dp[x] + dp[vec[x][i]] + 1);
+        dp[x] = max(dp[x], dp[vec[x][i]] + 1);
     }
-    return -1;
+    return;
 }
-
-int get_next_edge(int matrix[MX][MX], int node, int node2)
-{
-    for(int i = node2 + 1; i <= num; i++)
-    {
-        if(matrix[node][i] == 1)
-        {
-            return i;
-        }
-    }
-    return -1;
-}
-
-int dfs(int matrix[MX][MX], int visited[], int node)
-{
-    if(visited[node] == 0)
-    {
-        visited[node] = 1;
-        int deepth = 0;
-        for(int i = get_first_edge(matrix, node); i >= 0; i = get_next_edge(matrix, node, i))
-        {
-            if(visited[i] == 0)
-            {
-                int len  = dfs(matrix, visited, i);
-                if (len > deepth)
-                {
-                    deepth = len;
-                }
-            }
-        }
-        return deepth + 1;
-    }
-
-    return 0;
-}
-
-void print_matrix(int matrix[MX][MX])
-{
-    for(int i = 1; i <= num; i++)
-    {
-        for(int j = 1; j <= num; j++)
-        {
-            cout << matrix[i][j] << " ";
-        }
-        cout << endl;
-    }
-}
-
 int main()
 {
-    int n;
-    cin >> n;
-    while(n--)
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+    int n, m, ans = 0;
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i++)
     {
-        int matrix[MX][MX] = {0}, max = 0;
-
-        int node1, node2;
-        cin >> num;
-        for(int i = 1; i < num; i++)
+        scanf("%d", &m);
+        for (int j = 1; j < m; j++)
         {
-            cin >> node1 >> node2;
-
-            matrix[node1][node2] = 1;
-            matrix[node2][node1] = 1;
+            int a, b;
+            scanf("%d%d", &a, &b);
+            vec[a].push_back(b);
+            vec[b].push_back(a);
         }
-
-        // print_matrix(matrix);
-
-        for(int i = 1; i <= num; i++)
-        {
-            int visited[num+1] = {0};
-            int len = dfs(matrix, visited, i);
-            if(len > max)
-            {
-                max = len;
-
-            }
-        }
-        sum = sum + max - 1;
-        // cout << "max: " << max - 1 << endl;
+        memset(dp, 0, sizeof(dp));
+        dfs(1, 0);
+        for (int j = 1; j <= m; j++)
+            vec[j].clear();
+        ans += dp[0];
     }
-
-    cout << sum;
-
-   return 0;
+    printf("%d\n", ans);
+    return 0;
 }
