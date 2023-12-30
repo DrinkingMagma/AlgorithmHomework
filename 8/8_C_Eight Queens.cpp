@@ -1,3 +1,4 @@
+// 答案错误
 #include <stdio.h>
 int place[8] = {0};											// 皇后位置
 int flag[8] = {1, 1, 1, 1, 1, 1, 1, 1};						// 定义列
