@@ -1,24 +1,20 @@
-#include<iostream>
-#include<algorithm>
-#include<cstring>
+#include <iostream>
+#include <cstdio>
+#include <cmath>
 using namespace std;
- 
-int dp[1015][105];
-int a[105];
- 
+const int mod = 1000007;
+int n, m, a[120], f[120][120];
 int main()
 {
-	int n,m;
-	cin>>n>>m;
-	for(int i=1;i<=n;i++) cin>>a[i];
-	
-	dp[0][0]=1;
-	for(int i=1;i<=n;i++)
-	for(int j=0;j<=m;j++)
-	{
-		for(int k=0;k<=min(a[i],j);k++)
-		dp[i][j]=(dp[i][j]+dp[i-1][j-k])%1000007;
-	}
-	cout<<dp[n][m]<<endl;
+	scanf("%d%d", &n, &m);
+	for (int i = 1; i <= n; i++)
+		scanf("%d", &a[i]);
+	for (int i = 0; i <= n; i++)
+		f[i][0] = 1;
+	for (int i = 1; i <= n; i++)
+		for (int j = 1; j <= m; j++)
+			for (int k = 0; k <= min(j, a[i]); k++)
+				f[i][j] = (f[i][j] + f[i - 1][j - k]) % mod;
+	cout << f[n][m];
 	return 0;
 }
